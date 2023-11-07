@@ -4,7 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import db.DB;
 import db.DbException;
@@ -56,7 +59,8 @@ public class SellerDaoJDBC implements SellerDao{
 				/* o resultado da consulta para o ResultSet aponta para a posição 0. Esse if é para testar se houve retorno de algum 
 				 * resultado se não foi retornado nenhum registro na posição 1 (por isso o next()), então o objeto não existe no banco de 
 				 * dados*/
-				return instantiateSeller(rs);
+				Department dep = instantiateDepartment(rs);
+				return instantiateSeller(rs, dep);
 			}
 			else
 				return null;
@@ -76,9 +80,47 @@ public class SellerDaoJDBC implements SellerDao{
 		return null;
 	}
 
-	private Seller instantiateSeller(ResultSet rs) throws SQLException {
+	@Override
+	public List<Seller> findByDepartment(Department department) {
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try {
+			st = conn.prepareStatement(
+					"SELECT seller.*, department.Name as DepName "
+					+ "FROM seller INNER JOIN department "
+					+ "ON seller.DepartmentId = department.Id "
+					+ "WHERE DepartmentId = ? "
+					+ "ORDER BY NAME");
+			st.setInt(1, department.getId());
+			rs = st.executeQuery();
+			
+			List<Seller> list = new ArrayList<>();
+			Map<Integer, Department> map = new HashMap<>();
+			/* Para que não se instancie um objeto departamento para cada vendedor {e sim um departamento que abriga vários vendedores}
+			 * cria-se uma estrutura HashMap para conseguir checar se já existe um departamento criado que vai abrigar todos os vendedores */
+			while (rs.next()) {
+				Department dep = map.get(rs.getInt("DepartmentId"));
+				if(dep == null) {
+					dep = instantiateDepartment(rs);
+					map.put(rs.getInt("DepartmentId"), dep);
+				}
+				list.add(instantiateSeller(rs, dep));
+			}
+
+			return list;
+		}
+		catch(SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(st);
+			DB.closeResultSet(rs);
+		}
+	}
+	
+	private Seller instantiateSeller(ResultSet rs, Department department) throws SQLException {
 		return new Seller(rs.getInt("Id"), rs.getString("Name"), rs.getString("Email"), rs.getDate("BirthDate"), 
-				rs.getDouble("BaseSalary"), instantiateDepartment(rs));
+				rs.getDouble("BaseSalary"), department);
 	}
 	
 	private Department instantiateDepartment(ResultSet rs) throws SQLException {
