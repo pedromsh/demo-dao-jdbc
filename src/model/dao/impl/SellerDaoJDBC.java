@@ -56,8 +56,7 @@ public class SellerDaoJDBC implements SellerDao{
 				/* o resultado da consulta para o ResultSet aponta para a posição 0. Esse if é para testar se houve retorno de algum 
 				 * resultado se não foi retornado nenhum registro na posição 1 (por isso o next()), então o objeto não existe no banco de 
 				 * dados*/
-				return new Seller(rs.getInt("Id"), rs.getString("Name"), rs.getString("Email"), rs.getDate("BirthDate"), 
-						rs.getDouble("BaseSalary"), new Department(rs.getInt("DepartmentId"), rs.getString("DepName")));
+				return instantiateSeller(rs);
 			}
 			else
 				return null;
@@ -77,5 +76,12 @@ public class SellerDaoJDBC implements SellerDao{
 		return null;
 	}
 
+	private Seller instantiateSeller(ResultSet rs) throws SQLException {
+		return new Seller(rs.getInt("Id"), rs.getString("Name"), rs.getString("Email"), rs.getDate("BirthDate"), 
+				rs.getDouble("BaseSalary"), instantiateDepartment(rs));
+	}
 	
+	private Department instantiateDepartment(ResultSet rs) throws SQLException {
+		return new Department(rs.getInt("DepartmentId"), rs.getString("DepName"));
+	}
 }
