@@ -40,6 +40,9 @@ public class Program {
 		seller.setName("Ana Gloria");
 		sellerDao.update(seller);
 		System.out.println("Update completed");
+		
+		System.out.println("===TEST 6: seller deleteById() ===");
+		sellerDao.deleteById(9);
 	}
 
 }
