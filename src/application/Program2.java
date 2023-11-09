@@ -27,6 +27,12 @@ public class Program2 {
 			System.out.println(dep);
 		}
 		
+		System.out.println("=== TEST 4: Department update() ===");
+		Department dep2 = new Department(6, "House");
+		departmentDao.update(dep2);
+		System.out.println(departmentDao.findById(6));
+		
+		
 
 	}
 
