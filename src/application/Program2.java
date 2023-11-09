@@ -32,6 +32,9 @@ public class Program2 {
 		departmentDao.update(dep2);
 		System.out.println(departmentDao.findById(6));
 		
+		System.out.println("===TEST 5: department deleteById() ===");
+		departmentDao.deleteById(8);
+		System.out.println("Deleted");
 		
 
 	}
