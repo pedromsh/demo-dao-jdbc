@@ -43,6 +43,7 @@ public class Program {
 		
 		System.out.println("===TEST 6: seller deleteById() ===");
 		sellerDao.deleteById(9);
+		System.out.println("Deleted");
 	}
 
 }
