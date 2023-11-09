@@ -11,7 +11,7 @@ public class Program2 {
 		DepartmentDao departmentDao = DaoFactory.createDepartmentDao();
 		
 		System.out.println("=== TEST 1: Department insert() ===");
-		Department department = new Department(5, "Music");
+		Department department = new Department(null, "Music");
 		departmentDao.insert(department);
 		System.out.println("Inserted! new Id = " + department.getId());
 
